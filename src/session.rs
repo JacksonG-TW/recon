@@ -1191,6 +1191,12 @@ struct SessionFileInfo {
 }
 
 /// Read ~/.claude/sessions/{PID}.json files to build a PID → session info map.
+///
+/// A session that was moved to the background (Claude Code's agents view, `←` on an
+/// empty prompt, or a resumed session) records `parkedJobId` in its own file, and the
+/// conversation continues in a background job whose file carries that id as `jobId`
+/// and a *different* `sessionId`. The pane's own JSONL stops growing at that moment,
+/// so the pane is mapped to the job's session id instead.
 fn read_pid_session_map() -> HashMap<i32, SessionFileInfo> {
     let sessions_dir = match dirs::home_dir() {
         Some(h) => h.join(".claude").join("sessions"),
@@ -1203,6 +1209,10 @@ fn read_pid_session_map() -> HashMap<i32, SessionFileInfo> {
     };
 
     let mut map = HashMap::new();
+    // pid → parkedJobId, for panes whose conversation moved to a background job
+    let mut parked: HashMap<i32, String> = HashMap::new();
+    // jobId → sessionId of the background job that holds the conversation
+    let mut jobs: HashMap<String, String> = HashMap::new();
     for entry in entries.flatten() {
         let path = entry.path();
         if path.extension().map(|e| e == "json").unwrap_or(false) {
@@ -1220,9 +1230,20 @@ fn read_pid_session_map() -> HashMap<i32, SessionFileInfo> {
                                 started_at,
                             },
                         );
+                        if let Some(job) = v.get("parkedJobId").and_then(|j| j.as_str()) {
+                            parked.insert(pid as i32, job.to_string());
+                        }
+                        if let Some(job) = v.get("jobId").and_then(|j| j.as_str()) {
+                            jobs.insert(job.to_string(), sid.to_string());
+                        }
                     }
                 }
             }
+        }
+    }
+    for (pid, job) in parked {
+        if let (Some(job_sid), Some(info)) = (jobs.get(&job), map.get_mut(&pid)) {
+            info.session_id = job_sid.clone();
         }
     }
     map
