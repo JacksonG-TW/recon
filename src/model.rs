@@ -14,6 +14,7 @@
 //! | Model        | API ID                       | Context window |
 //! |--------------|------------------------------|----------------|
 //! | Fable 5      | claude-fable-5               | 1M             |
+//! | Opus 5       | claude-opus-5                | 1M             |
 //! | Opus 4.8     | claude-opus-4-8              | 1M             |
 //! | Opus 4.7     | claude-opus-4-7              | 1M             |
 //! | Opus 4.6     | claude-opus-4-6              | 1M             |
@@ -31,6 +32,7 @@
 pub fn display_name(model_id: &str) -> &str {
     match model_id {
         "claude-fable-5" => "Fable 5",
+        "claude-opus-5" => "Opus 5",
         "claude-opus-4-8" => "Opus 4.8",
         "claude-opus-4-7" => "Opus 4.7",
         "claude-opus-4-6" => "Opus 4.6",
@@ -50,6 +52,7 @@ pub fn display_name(model_id: &str) -> &str {
 pub fn context_window(model_id: &str) -> u64 {
     match model_id {
         "claude-fable-5" => 1_000_000,
+        "claude-opus-5" => 1_000_000,
         "claude-opus-4-8" => 1_000_000,
         "claude-opus-4-7" => 1_000_000,
         "claude-opus-4-6" => 1_000_000,
@@ -82,6 +85,7 @@ fn is_opus_1m(model_id: &str) -> bool {
 pub fn id_from_display_name(display: &str) -> Option<&'static str> {
     match display {
         "Fable 5" | "Fable 5 (1M context)" => Some("claude-fable-5"),
+        "Opus 5" | "Opus 5 (1M context)" => Some("claude-opus-5"),
         "Opus 4.8" | "Opus 4.8 (1M context)" => Some("claude-opus-4-8"),
         "Opus 4.7" | "Opus 4.7 (1M context)" => Some("claude-opus-4-7"),
         "Opus 4.6" | "Opus 4.6 (1M context)" => Some("claude-opus-4-6"),
@@ -112,6 +116,7 @@ mod tests {
     #[test]
     fn one_million_context_models() {
         assert_eq!(context_window("claude-fable-5"), 1_000_000);
+        assert_eq!(context_window("claude-opus-5"), 1_000_000);
         assert_eq!(context_window("claude-opus-4-8"), 1_000_000);
         assert_eq!(context_window("claude-opus-4-7"), 1_000_000);
         assert_eq!(context_window("claude-opus-4-6"), 1_000_000);
