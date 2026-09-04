@@ -13,6 +13,7 @@
 //!
 //! | Model        | API ID                       | Context window |
 //! |--------------|------------------------------|----------------|
+//! | Fable 5.1    | claude-fable-5-1             | 1M             |
 //! | Fable 5      | claude-fable-5               | 1M             |
 //! | Opus 5       | claude-opus-5                | 1M             |
 //! | Opus 4.8     | claude-opus-4-8              | 1M             |
@@ -31,6 +32,7 @@
 /// Map raw model IDs to human-friendly display names.
 pub fn display_name(model_id: &str) -> &str {
     match model_id {
+        "claude-fable-5-1" => "Fable 5.1",
         "claude-fable-5" => "Fable 5",
         "claude-opus-5" => "Opus 5",
         "claude-opus-4-8" => "Opus 4.8",
@@ -51,6 +53,7 @@ pub fn display_name(model_id: &str) -> &str {
 /// Context window size for a given model ID.
 pub fn context_window(model_id: &str) -> u64 {
     match model_id {
+        "claude-fable-5-1" => 1_000_000,
         "claude-fable-5" => 1_000_000,
         "claude-opus-5" => 1_000_000,
         "claude-opus-4-8" => 1_000_000,
@@ -84,6 +87,7 @@ fn is_opus_1m(model_id: &str) -> bool {
 /// Returns None if the display name is not recognized.
 pub fn id_from_display_name(display: &str) -> Option<&'static str> {
     match display {
+        "Fable 5.1" | "Fable 5.1 (1M context)" => Some("claude-fable-5-1"),
         "Fable 5" | "Fable 5 (1M context)" => Some("claude-fable-5"),
         "Opus 5" | "Opus 5 (1M context)" => Some("claude-opus-5"),
         "Opus 4.8" | "Opus 4.8 (1M context)" => Some("claude-opus-4-8"),
