@@ -145,14 +145,20 @@ fn render_column(col: Column, session: &Session) -> Cell<'static> {
         Column::Model => Cell::from(session.model_display()),
         Column::Effort => {
             let e = session.effort_display();
+            // Colours follow Claude Code's own /effort panel, so a glance reads the same in both.
             let color = match e.as_str() {
-                "low" => Color::Blue,
-                "medium" => Color::Cyan,
-                "high" => Color::Reset,
-                "xhigh" | "max" => Color::Magenta,
-                _ => Color::DarkGray,
+                "low" => Some(Color::Rgb(0xF5, 0xC4, 0x00)),       // yellow
+                "medium" => Some(Color::Rgb(0x7F, 0xD8, 0x8F)),    // green
+                "high" => Some(Color::Rgb(0x8E, 0xC8, 0xFF)),      // light blue
+                "xhigh" => Some(Color::Rgb(0xA8, 0xA8, 0xFF)),     // periwinkle
+                "max" => Some(Color::Rgb(0xFF, 0x7A, 0x59)),       // coral
+                "ultracode" => Some(Color::Rgb(0xB3, 0x88, 0xFF)), // purple
+                _ => None,
             };
-            Cell::from(e).style(Style::default().fg(color))
+            match color {
+                Some(c) => Cell::from(e).style(Style::default().fg(c).add_modifier(Modifier::BOLD)),
+                None => Cell::from(e).style(Style::default().fg(Color::DarkGray)),
+            }
         }
         Column::Context => {
             let token_ratio = session.token_ratio();
