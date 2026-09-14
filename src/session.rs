@@ -144,8 +144,16 @@ impl Session {
 
     pub fn model_display(&self) -> String {
         match &self.model {
-            Some(m) => model::format_with_effort(m, self.effort.as_deref().unwrap_or("")),
+            Some(m) => model::display_name(m).to_string(),
             None => "—".to_string(),
+        }
+    }
+
+    /// The session's effort level as last recorded in its transcript, or «—».
+    pub fn effort_display(&self) -> String {
+        match self.effort.as_deref() {
+            Some(e) if !e.is_empty() && e != "default" => e.to_string(),
+            _ => "—".to_string(),
         }
     }
 }
@@ -676,6 +684,13 @@ fn decode_project_path(project_dir: &Path) -> String {
 struct JsonlEntry {
     #[serde(default)]
     message: Option<MessageEntry>,
+    /// Claude Code records the effort each assistant turn ran at (2.1.2xx+):
+    /// `"effort":"high","perTurnEffort":"high"`. The per-turn value wins when both exist,
+    /// because `/effort` and per-message effort change it mid-session.
+    #[serde(default)]
+    effort: Option<String>,
+    #[serde(default, rename = "perTurnEffort")]
+    per_turn_effort: Option<String>,
     #[serde(default)]
     timestamp: Option<String>,
     #[serde(default)]
@@ -784,6 +799,11 @@ fn parse_jsonl(
                 }
                 if entry.cwd.is_some() {
                     cwd = entry.cwd;
+                }
+                if let Some(e) = entry.per_turn_effort.or(entry.effort) {
+                    if !e.is_empty() {
+                        effort = Some(e);
+                    }
                 }
                 if let Some(msg) = entry.message {
                     if let Some(m) = msg.model {
@@ -1355,6 +1375,27 @@ fn find_claude_child_pid(parent_pid: i32) -> Option<i32> {
 mod tests {
     use super::*;
     use std::io::{BufReader, Cursor};
+
+    #[test]
+    fn effort_is_read_from_assistant_lines_and_the_latest_turn_wins() {
+        let dir = std::env::temp_dir().join(format!("recon-effort-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("s.jsonl");
+        let lines = [
+            r#"{"type":"assistant","timestamp":"2026-09-14T10:00:00Z","effort":"high","perTurnEffort":"high","message":{"model":"claude-opus-5","usage":{"input_tokens":1,"output_tokens":1}}}"#,
+            r#"{"type":"assistant","timestamp":"2026-09-14T10:01:00Z","effort":"high","perTurnEffort":"medium","message":{"model":"claude-opus-5","usage":{"input_tokens":1,"output_tokens":1}}}"#,
+        ];
+        fs::write(&path, lines.join("\n") + "\n").unwrap();
+        let info = parse_jsonl(&path, 0, 0, 0, None, None, None);
+        assert_eq!(info.effort.as_deref(), Some("medium"));
+        assert_eq!(info.model.as_deref(), Some("claude-opus-5"));
+
+        // A transcript that records no effort leaves it unknown rather than inventing one.
+        fs::write(&path, r#"{"type":"assistant","timestamp":"t","message":{"model":"claude-opus-5"}}"#.to_string() + "\n").unwrap();
+        let info = parse_jsonl(&path, 0, 0, 0, None, None, None);
+        assert_eq!(info.effort, None);
+        let _ = fs::remove_dir_all(&dir);
+    }
 
     #[test]
     fn read_line_capped_normal() {

@@ -17,19 +17,21 @@ pub enum Column {
     Directory,
     Status,
     Model,
+    Effort,
     Context,
     LastActivity,
 }
 
 impl Column {
     /// All columns in the default display order.
-    pub const ALL: [Column; 8] = [
+    pub const ALL: [Column; 9] = [
         Column::Session,
         Column::Window,
         Column::Project,
         Column::Directory,
         Column::Status,
         Column::Model,
+        Column::Effort,
         Column::Context,
         Column::LastActivity,
     ];
@@ -43,6 +45,7 @@ impl Column {
             Column::Directory => "directory",
             Column::Status => "status",
             Column::Model => "model",
+            Column::Effort => "effort",
             Column::Context => "context",
             Column::LastActivity => "last_activity",
         }
@@ -57,6 +60,7 @@ impl Column {
             Column::Directory => "Directory",
             Column::Status => "Status",
             Column::Model => "Model",
+            Column::Effort => "Effort",
             Column::Context => "Context",
             Column::LastActivity => "Last Activity",
         }

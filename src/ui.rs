@@ -93,6 +93,7 @@ fn column_constraint(col: Column, app: &App) -> Constraint {
         Column::Directory => Constraint::Length(20),
         Column::Status => Constraint::Length(10),
         Column::Model => Constraint::Length(20),
+        Column::Effort => Constraint::Length(8),
         Column::Context => Constraint::Length(14),
         Column::LastActivity => Constraint::Length(14),
     }
@@ -142,6 +143,17 @@ fn render_column(col: Column, session: &Session) -> Cell<'static> {
             ]))
         }
         Column::Model => Cell::from(session.model_display()),
+        Column::Effort => {
+            let e = session.effort_display();
+            let color = match e.as_str() {
+                "low" => Color::Blue,
+                "medium" => Color::Cyan,
+                "high" => Color::Reset,
+                "xhigh" | "max" => Color::Magenta,
+                _ => Color::DarkGray,
+            };
+            Cell::from(e).style(Style::default().fg(color))
+        }
         Column::Context => {
             let token_ratio = session.token_ratio();
             let style = if token_ratio > 0.9 {

@@ -103,16 +103,6 @@ pub fn id_from_display_name(display: &str) -> Option<&'static str> {
     }
 }
 
-/// Format model name with optional effort level.
-pub fn format_with_effort(model_id: &str, effort: &str) -> String {
-    let name = display_name(model_id);
-    if effort.is_empty() || effort == "default" {
-        name.to_string()
-    } else {
-        format!("{name} ({effort})")
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -455,6 +455,7 @@ impl App {
                     "pane_target": s.pane_target,
                     "model": s.model,
                     "model_display": s.model_display(),
+                    "effort": s.effort,
                     "total_input_tokens": s.total_input_tokens,
                     "total_output_tokens": s.total_output_tokens,
                     "context_display": s.token_display(),
