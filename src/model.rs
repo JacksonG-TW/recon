@@ -15,11 +15,13 @@
 //! |--------------|------------------------------|----------------|
 //! | Fable 5.1    | claude-fable-5-1             | 1M             |
 //! | Fable 5      | claude-fable-5               | 1M             |
+//! | Opus 5.5     | claude-opus-5-5              | 1M             |
 //! | Opus 5       | claude-opus-5                | 1M             |
 //! | Opus 4.8     | claude-opus-4-8              | 1M             |
 //! | Opus 4.7     | claude-opus-4-7              | 1M             |
 //! | Opus 4.6     | claude-opus-4-6              | 1M             |
 //! | Opus 4.5     | claude-opus-4-5-20251101     | 200k           |
+//! | Sonnet 5.5   | claude-sonnet-5-5            | 1M             |
 //! | Sonnet 5     | claude-sonnet-5              | 1M             |
 //! | Sonnet 4.6   | claude-sonnet-4-6            | 1M             |
 //! | Sonnet 4.5   | claude-sonnet-4-5-20250929   | 200k           |
@@ -34,11 +36,13 @@ pub fn display_name(model_id: &str) -> &str {
     match model_id {
         "claude-fable-5-1" => "Fable 5.1",
         "claude-fable-5" => "Fable 5",
+        "claude-opus-5-5" => "Opus 5.5",
         "claude-opus-5" => "Opus 5",
         "claude-opus-4-8" => "Opus 4.8",
         "claude-opus-4-7" => "Opus 4.7",
         "claude-opus-4-6" => "Opus 4.6",
         "claude-opus-4-5-20251101" => "Opus 4.5",
+        "claude-sonnet-5-5" => "Sonnet 5.5",
         "claude-sonnet-5" => "Sonnet 5",
         "claude-sonnet-4-6" => "Sonnet 4.6",
         "claude-sonnet-4-5-20250929" => "Sonnet 4.5",
@@ -55,11 +59,13 @@ pub fn context_window(model_id: &str) -> u64 {
     match model_id {
         "claude-fable-5-1" => 1_000_000,
         "claude-fable-5" => 1_000_000,
+        "claude-opus-5-5" => 1_000_000,
         "claude-opus-5" => 1_000_000,
         "claude-opus-4-8" => 1_000_000,
         "claude-opus-4-7" => 1_000_000,
         "claude-opus-4-6" => 1_000_000,
         "claude-opus-4-5-20251101" => 200_000,
+        "claude-sonnet-5-5" => 1_000_000,
         "claude-sonnet-5" => 1_000_000,
         "claude-sonnet-4-6" => 1_000_000,
         "claude-sonnet-4-5-20250929" => 200_000,
@@ -89,10 +95,12 @@ pub fn id_from_display_name(display: &str) -> Option<&'static str> {
     match display {
         "Fable 5.1" | "Fable 5.1 (1M context)" => Some("claude-fable-5-1"),
         "Fable 5" | "Fable 5 (1M context)" => Some("claude-fable-5"),
+        "Opus 5.5" | "Opus 5.5 (1M context)" => Some("claude-opus-5-5"),
         "Opus 5" | "Opus 5 (1M context)" => Some("claude-opus-5"),
         "Opus 4.8" | "Opus 4.8 (1M context)" => Some("claude-opus-4-8"),
         "Opus 4.7" | "Opus 4.7 (1M context)" => Some("claude-opus-4-7"),
         "Opus 4.6" | "Opus 4.6 (1M context)" => Some("claude-opus-4-6"),
+        "Sonnet 5.5" | "Sonnet 5.5 (1M context)" => Some("claude-sonnet-5-5"),
         "Sonnet 5" | "Sonnet 5 (1M context)" => Some("claude-sonnet-5"),
         "Sonnet 4.6" => Some("claude-sonnet-4-6"),
         "Sonnet 4.5" => Some("claude-sonnet-4-5-20250929"),
@@ -110,7 +118,9 @@ mod tests {
     #[test]
     fn one_million_context_models() {
         assert_eq!(context_window("claude-fable-5"), 1_000_000);
+        assert_eq!(context_window("claude-opus-5-5"), 1_000_000);
         assert_eq!(context_window("claude-opus-5"), 1_000_000);
+        assert_eq!(context_window("claude-sonnet-5-5"), 1_000_000);
         assert_eq!(context_window("claude-opus-4-8"), 1_000_000);
         assert_eq!(context_window("claude-opus-4-7"), 1_000_000);
         assert_eq!(context_window("claude-opus-4-6"), 1_000_000);
